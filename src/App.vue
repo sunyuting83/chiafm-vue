@@ -52,7 +52,6 @@ export default {
         content = JSON.parse(received_msg.content)
       }
       if (Array.isArray(content)) {
-        console.log("array")
         for (let i = 0; i < content.length; i++) {
           const element = content[i];
           t.list = [...t.list, JSON.parse(element)];
@@ -96,18 +95,13 @@ export default {
       arr = arr.filter((x)=>{
         return x.ApiKey === ApiKey
       })
-      console.log(arr)
+      // console.log(arr)
       return arr.length
     }
   },
   unmounted() {
     this.websock.close()
     console.log('连接已关闭...')
-  },
-  watch:{
-    list(val) {
-      console.log(val)
-    }
   }
 }
 </script>
