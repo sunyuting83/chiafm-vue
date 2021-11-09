@@ -1,11 +1,106 @@
 <template>
   <div class="container" v-if="status">
-    <div class="columns is-multiline">
-      <div class="column is-5" v-for="(item,index) in list" :key="item.ApiKey">
+    <div class="columns is-flex-wrap-wrap">
+      <div class="column is-6" v-for="item in list" :key="item.ApiKey">
         <div class="box">
-          <h3>{{item.PcName}}</h3>
-          <div v-if="item.Online">{{index}}</div>
-          <div>{{item.CPU.LoadPerc}}</div>
+          <div class="content">
+            <div class="level">
+              <h5 class="title level-left mb-0">{{item.PcName}}</h5>
+              <span class="level-right icon-text has-text-grey-light">
+                <span class="icon">
+                  <font-awesome-icon :icon="['fab', item.OS]" fixed-width />
+                </span>
+                <span class="has-text-grey-light">{{item.OS === "windows"? "Windows":"Linux"}}</span>
+              </span>
+            </div>
+            <div class="columns is-size-6 is-mobile">
+              <div class="column is-6">
+                <span class="icon va mr-1">
+                  <font-awesome-layers class="fa-lg">
+                    <font-awesome-icon icon="circle" :style="{color:(item.Online?'#23d160':'#7a7a7a')}" />
+                    <font-awesome-icon :icon="item.Online ? 'check' : 'times'" transform="shrink-6" style="color: white" />
+                  </font-awesome-layers>
+                </span>
+                <span :class="item.Online ? 'is-size-6 has-text-primary' : 'is-size-6 has-text-grey'">{{item.Online ? "矿机在线" : "矿机离线"}}</span>
+              </div>
+              <div class="column is-6">
+                <span class="icon va mr-1">
+                  <font-awesome-layers class="fa-lg">
+                    <font-awesome-icon icon="circle" :style="{color:(item.Online?'#23d160':'#f14668')}" />
+                    <font-awesome-icon :icon="item.Online ? 'check' : 'times'" transform="shrink-6" style="color: white" />
+                  </font-awesome-layers>
+                </span>
+                <span :class="item.Online ? 'is-size-6 has-text-primary' : 'is-size-6 has-text-danger'">{{item.Online ? "正在耕种" : "停止耕种"}}</span>
+              </div>
+            </div>
+            <div class="columns is-multiline is-mobile">
+              <div class="column is-12">
+                <span class="icon va mr-1">
+                  <font-awesome-layers class="fa-lg">
+                    <font-awesome-icon icon="circle" :style="{color:(item.Online?'#23d160':'#febb00')}" />
+                    <font-awesome-icon :icon="item.Online ? 'check' : 'times'" transform="shrink-6" style="color: white" />
+                  </font-awesome-layers>
+                </span>
+                <span :class="item.Online ? 'color is-size-6 has-text-primary' : 'color is-size-6 has-text-warning'">{{item.Online ? "检图正常" : "检图异常"}}</span>
+              </div>
+              <div class="column is-6 has-text-grey-dark">
+                实际图数：{{item.PlotNumber}}
+              </div>
+              <div class="column is-6 has-text-grey-dark">
+                检图总数：{{item.PlotInfo.PlotNumber}}
+              </div>
+            </div>
+            <hr class="mt-0 mb-3" />
+            <div class="columns is-mobile">
+              <div class="column is-3 pt-5">CPU使用率</div>
+              <div class="column is-9 has-text-centered">
+                <span>{{item.CPU.LoadPerc}}%</span>
+                <progress class="progress is-primary is-small" :value="item.CPU.LoadPerc" max="100">{{item.CPU.LoadPerc}}</progress>
+              </div>
+            </div>
+            <div class="columns is-mobile">
+              <div class="column is-3 pt-5">内存使用率</div>
+              <div class="column is-9 has-text-centered">
+                <div class="level mb-0">
+                  <span class="level-left mb-0">已用：{{item.Memory.Used}}</span>
+                  <span class="level-right mb-0">总数：{{item.Memory.TotalMemory}}</span>
+                </div>
+                <progress class="progress is-warning is-small" :value="item.Memory.MemPerc" max="100">{{item.Memory.MemPerc}}</progress>
+              </div>
+            </div>
+            <div v-if="item.Hidden">
+              <hr />
+              <div class="columns mb-0 is-size-7 is-mobile">
+                <div class="column is-3 pt-3">最后活跃时间：</div>
+                <div class="column is-9">{{item.time}}</div>
+              </div>
+              <div class="columns mb-0 is-size-7 is-mobile">
+                <div class="column is-3 pt-3">CPU：</div>
+                <div class="column is-9">{{item.CPU.CpuName}}</div>
+              </div>
+              <div class="columns mb-0 is-size-7 is-mobile">
+                <div class="column is-3 pt-3">IP：</div>
+                <div class="column is-9">{{item.NetWorks.IPAddress}}</div>
+              </div>
+              <div class="columns is-size-7 is-mobile">
+                <div class="column is-3 pt-3">MAC：</div>
+                <div class="column is-9">{{item.NetWorks.MACAddress}}</div>
+              </div>
+              <div class="columns is-flex-wrap-wrap is-mobile" v-if="item.Drive.length > 0">
+                <div class="column is-3" v-for="(d,index) in item.Drive" :key="index">
+                  <span>{{d.DeviceID}}</span>
+                  <progress class="progress is-danger is-small" value="20" max="100">20%</progress>
+                </div>
+              </div>
+            </div>
+            <hr />
+            <button class="button is-small is-link is-fullwidth" @click="HiddenShow(item.ApiKey)">
+              <span>点击展开详细</span>
+              <span class="icon">
+                <font-awesome-icon :icon="['fa', 'angle-double-down']" fixed-width />
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -27,7 +122,7 @@ export default {
   },
   created(){
     console.log("start")
-    const ip = "127.0.0.1:13002"
+    const ip = "a.chiafm.xyz:13002"
     const path = "server"
     const token = "manage_sdkjfskldjflksdjf"
     this.initWebSocket(ip,path,token)
@@ -53,8 +148,7 @@ export default {
       }
       if (Array.isArray(content)) {
         for (let i = 0; i < content.length; i++) {
-          const element = content[i];
-          t.list = [...t.list, JSON.parse(element)];
+          t.list = [...t.list, JSON.parse(content[i])];
           if (i === content.length -1) {
             t.status = true
           }
@@ -62,23 +156,21 @@ export default {
       }else {
         if (content === "offline") {
           const sender = received_msg.sender.split("_")[1]
-          t.list = t.list.filter((x) => {
-            if (x.ApiKey == sender) {
-              x.Online = false
+          for (let i = 0; i < t.list.length; i++) {
+            if (t.list[i].ApiKey === sender) {
+              t.list[i].Online = false
             }
-            return x
-          })
+          }
         }else{
           if (t.list.length <= 0) {
             t.list = [...t.list,content]
             t.status = true
           }
-          t.list = t.list.map((x) => {
-            if (x.ApiKey === content.ApiKey) {
-              x = content
+          for (let i = 0; i < t.list.length; i++) {
+            if (t.list[i].ApiKey === content.ApiKey) {
+              t.list[i] = content
             }
-            return x
-          })
+          }
           if (this.checkHas(t.list,content.ApiKey) === 0) {
             t.list.push(content)
           }
@@ -97,6 +189,13 @@ export default {
       })
       // console.log(arr)
       return arr.length
+    },
+    HiddenShow(v){
+      for (let i = 0; i < this.list.length; i++) {
+        if (this.list[i].ApiKey === v) {
+          this.list[i].Hidden = !this.list[i].Hidden
+        }
+      }
     }
   },
   unmounted() {
@@ -108,18 +207,12 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  padding-top: 1rem
 }
- 
-.columns {
-   flex-wrap: wrap; 
-   justify-content: space-between
+.va {
+  vertical-align: bottom
 }
-.column.is-5 {
-height: 100%;
+.color.has-text-warning {
+  color: #d79e00 !important;
 }
 </style>
