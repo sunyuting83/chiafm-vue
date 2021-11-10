@@ -87,17 +87,27 @@
                 <div class="column is-9">{{item.NetWorks.MACAddress}}</div>
               </div>
               <div class="columns is-flex-wrap-wrap is-mobile" v-if="item.Drive.length > 0">
-                <div class="column is-3" v-for="(d,index) in item.Drive" :key="index">
-                  <span>{{d.DeviceID}}</span>
-                  <progress class="progress is-danger is-small" value="20" max="100">20%</progress>
+                <div class="column is-3 is-size-7" v-for="(d,index) in item.Drive" :key="index">
+                  <div class="is-size-6">{{d.DeviceID}}</div>
+                  <div class="is-flex is-flex-wrap-wrap is-justify-content-space-between	">
+                    <div class="is-flex">已用:{{d.Used}}</div>
+                    <div class="is-flex">容量:{{d.Size}}</div>
+                  </div>
+                  <div>
+                    <span>图数:{{d.PlotNumber}}</span>
+                  </div>
+                  <div>
+                    <span>扫描用时:{{d.ScanTime}}</span>
+                  </div>
+                  <progress class="progress is-danger is-small" :value="d.Percent" max="100">{{d.Percent}}</progress>
                 </div>
               </div>
             </div>
             <hr />
             <button class="button is-small is-link is-fullwidth" @click="HiddenShow(item.ApiKey)">
-              <span>点击展开详细</span>
+              <span>{{item.Hidden?"点击收起详细":"点击展开详细"}}</span>
               <span class="icon">
-                <font-awesome-icon :icon="['fa', 'angle-double-down']" fixed-width />
+                <font-awesome-icon :icon="item.Hidden ? 'angle-double-up' : 'angle-double-down'" fixed-width />
               </span>
             </button>
           </div>
@@ -181,6 +191,7 @@ export default {
       this.websock.send(Data);
     },
     websocketclose(e){  //关闭
+      this.status = false
       console.log('断开连接',e);
     },
     checkHas(arr,ApiKey){
