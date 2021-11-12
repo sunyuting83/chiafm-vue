@@ -157,10 +157,12 @@ export default {
         content = JSON.parse(received_msg.content)
       }
       if (Array.isArray(content)) {
-        for (let i = 0; i < content.length; i++) {
-          t.list = [...t.list, JSON.parse(content[i])];
-          if (i === content.length -1) {
-            t.status = true
+        if (this.list.length === 0) {
+          for (let i = 0; i < content.length; i++) {
+            t.list = [...t.list, JSON.parse(content[i])];
+            if (i === content.length -1) {
+              t.status = true
+            }
           }
         }
       }else {
