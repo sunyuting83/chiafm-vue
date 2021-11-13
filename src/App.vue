@@ -157,7 +157,7 @@ export default {
         content = JSON.parse(received_msg.content)
       }
       if (Array.isArray(content)) {
-        if (this.list.length === 0) {
+        if (!this.status) {
           for (let i = 0; i < content.length; i++) {
             t.list = [...t.list, JSON.parse(content[i])];
             if (i === content.length -1) {
